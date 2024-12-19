@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 from extract_urls import extract_filtered_links
 from captcha_handler import recognize_captcha
 from extract_details import extract_target_data
@@ -10,7 +11,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     search_keyword = args.keyword  # 从命令行获取搜索关键词
-    output_csv = "extracted_data.csv"
+
+    # 使用关键词和当前日期生成输出文件名
+    current_date = datetime.now().strftime("%Y%m%d")
+    output_csv = f"{search_keyword}_{current_date}.csv"
 
     # 提取URL
     print("[*] 开始提取URL...")

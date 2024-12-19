@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright
 import csv
 import time
 import re
+from datetime import datetime
 
 def extract_target_data(url_list, output_csv):
     """
@@ -18,7 +19,7 @@ def extract_target_data(url_list, output_csv):
         page = context.new_page()
 
         # 初始化CSV字段
-        base_fields = ["url", "price", "lease_type", "tags", "keywords", "building_name", "layout"]
+        base_fields = ["url", "price", "lease_type", "tags", "keywords", "building_name", "layout", "scraped_time"]
         dynamic_fields = set()  # 存储 test1 动态生成的键
 
         # 第二次遍历URL，提取数据并写入CSV
@@ -58,7 +59,7 @@ def extract_target_data(url_list, output_csv):
                         lease_type_list.append(lease_text)
 
                     # 提取标签数据并清洗
-                    tags_list = [tag.text_content().strip().replace("\n", ", ").replace("权属核验", "").strip(', ') for tag in tags_elements]
+                    tags_list = [tag.text_content().strip().replace("\n", ", ").replace("权属核验", "").strip(', ').replace(" ", "") for tag in tags_elements]
                     cleaned_tags = ", ".join(tags_list)
 
                     # 提取 test1 数据
@@ -86,6 +87,7 @@ def extract_target_data(url_list, output_csv):
                         writer.writeheader()
 
                     # 构建行数据
+                    scraped_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     row_data = {
                         "url": url,
                         "price": ", ".join(price_list),
@@ -93,7 +95,8 @@ def extract_target_data(url_list, output_csv):
                         "tags": cleaned_tags,
                         "keywords": ", ".join(set(matched_keywords)),
                         "building_name": extracted_title,
-                        "layout": extracted_subtitle
+                        "layout": extracted_subtitle,
+                        "scraped_time": scraped_time
                     }
                     row_data.update(test1_data)  # 添加动态字段数据
 
